@@ -10,18 +10,36 @@ const categories = ['fruit', 'vegetable', 'dairy'];
 
 const MongoStore = require('connect-mongo');
 
-//const dburl = process.env.DB_URL || 'mongodb://localhost:27017/farmStandTake2';
+const dburl = process.env.DB_URL || 'mongodb://localhost:27017/farmStandTake2';
 
 
 
-mongoose.connect('mongodb://localhost:27017/farmStandTake2', { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => {
-        console.log("MONGO CONNECTION OPEN!!!")
-    })
-    .catch(err => {
-        console.log("OH NO MONGO CONNECTION ERROR!!!!")
-        console.log(err)
-    })
+mongoose.connect(dburl, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false
+});
+
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "connection error:"));
+db.once("open", () => {
+    console.log("Database connected");
+});
+
+
+const store = MongoStore.create({
+    mongoUrl: dburl,
+    touchAfter: 24 * 60 * 60,
+    crypto: {
+        secret: 'thisshouldbeabettersecret!'
+    }
+});
+
+store.on("error", function (e) {
+    console.log("SESSION STORE ERROR", e)
+})
+
 
 
 app.set('views', path.join(__dirname, 'views'));
@@ -127,11 +145,9 @@ app.delete('/products/:id', async (req, res) => {
 })
 
 
-
-
 const port = process.env.PORT || 3000;
 
-app.listen(port, () => {
+app.listen(3000, () => {
     console.log("APP IS LISTENING ON PORT 3000!")
 })
 

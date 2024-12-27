@@ -12,6 +12,7 @@
     "32_mongoose_express": "file:",
     "32_Mongoose_Express": "file:",
     "connect-mongo": "^5.1.0",
+    "dotenv": "^16.4.7",
     "ejs": "^3.1.10",
     "express": "^4.21.2",
     "method-override": "^3.0.0",

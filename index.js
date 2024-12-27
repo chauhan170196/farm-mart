@@ -8,8 +8,13 @@ const Product = require('./models/product');
 const Farm = require('./models/farm')
 const categories = ['fruit', 'vegetable', 'dairy'];
 
+const MongoStore = require('connect-mongo');
 
-mongoose.connect('mongodb://localhost:27017/farmStandTake2', { useNewUrlParser: true, useUnifiedTopology: true })
+const dburl = process.env.DB_URL || 'mongodb://localhost:27017/farmStandTake2';
+
+
+
+mongoose.connect(dburl, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
         console.log("MONGO CONNECTION OPEN!!!")
     })
@@ -17,6 +22,20 @@ mongoose.connect('mongodb://localhost:27017/farmStandTake2', { useNewUrlParser: 
         console.log("OH NO MONGO CONNECTION ERROR!!!!")
         console.log(err)
     })
+
+
+const store = MongoStore.create({
+    mongoUrl: dburl,
+    touchAfter: 24 * 60 * 60,
+    crypto: {
+        secret: 'thisshouldbeabettersecret!'
+    }
+});
+
+store.on("error", function (e) {
+    console.log("SESSION STORE ERROR", e)
+})
+
 
 
 app.set('views', path.join(__dirname, 'views'));
